@@ -1,0 +1,12 @@
+#root {
+  display: flex;
+
+  flex-direction: row;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
