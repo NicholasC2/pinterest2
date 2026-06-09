@@ -21,7 +21,9 @@ function App() {
         <label>Search:</label>
         <div className="row search">
           <input />
-          <button>Search</button>
+        </div>
+        <label>Tags:</label>
+        <div className='row wrap tags'>
         </div>
         <hr></hr>
       </div>

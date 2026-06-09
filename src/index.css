@@ -26,6 +26,8 @@ body,
   padding: 10px;
 
   background-color: var(--bg-secondary);
+
+  width: 221px;
 }
 
 .navbar * {
@@ -57,6 +59,16 @@ body,
   display: inline-flex;
 
   flex-direction: row;
+}
+
+.row.wrap {
+  display: flex;
+
+  height: auto;
+}
+
+.wrap {
+  flex-wrap: wrap;
 }
 
 .row > * {
