@@ -4,6 +4,7 @@ body {
     color: var(--text-primary);
 }
 
+a,
 button,
 input {
     font-family: inherit;
@@ -11,10 +12,17 @@ input {
     border: 2px solid var(--border);
     border-radius: 5px;
     padding: 6px 12px;
-    box-sizing: border-box; 
+    box-sizing: border-box;
     transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
+a {
+    align-content: center;
+    text-align: center;
+    text-decoration: none;
+}
+
+a,
 button {
     background-color: var(--bg-button);
     color: var(--text-primary);
@@ -22,12 +30,14 @@ button {
     font-weight: 500;
 }
 
+a:hover,
 button:hover {
     background-color: var(--accent);
     border-color: var(--accent-hover);
     color: var(--text-on-accent);
 }
 
+a:active,
 button:active {
     background-color: var(--accent-hover);
 }

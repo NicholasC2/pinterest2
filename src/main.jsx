@@ -11,21 +11,14 @@ function App() {
 
   return (
     <>
-      <button
-        className="menuButton"
-        onClick={() => setOpen(!open)}
-      >
-        ☰
-      </button>
-      <div className={`navbar ${open ? 'open' : ''}`}>
-        <label>Search:</label>
-        <div className="row search">
-          <input />
+      <div className="navbar row">
+        <div className="column navigation">
+          <a href="/">test</a>
+          <button>test</button>
         </div>
-        <label>Tags:</label>
-        <div className='row wrap tags'>
+        <div className="row white-space">
+
         </div>
-        <hr></hr>
       </div>
       <div className="content">
 
