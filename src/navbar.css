@@ -1,0 +1,99 @@
+.navbar {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+
+  box-sizing: border-box;
+  background-color: var(--bg-secondary);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-spacer {
+  flex: 1;
+}
+
+.account-trigger {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  justify-content: center;
+
+  user-select: none;
+
+  position: relative;
+
+  width: 80px;
+  height: 80px;
+
+  cursor: pointer;
+}
+
+.avatar {
+  background: none;
+  border: none;
+
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 10%;
+  box-sizing: border-box;
+}
+
+.avatar:hover {
+  background: none;
+}
+
+.account-button {
+  display: flex;
+  align-items: center;
+
+  font-size: 2em;
+}
+
+.account-button svg {
+  transition: transform 150ms ease-in-out;
+}
+
+.account-button.open svg {
+  transform: rotate(180deg);
+}
+
+.avatar img {
+  width: auto;
+  height: 100%;
+
+  aspect-ratio: 1;
+
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.account-menu {
+  position: absolute;
+  top: 100px;
+  right: 10px;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 10px;
+
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+
+  z-index: 100;
+}
+
+.account-menu > * {
+  margin: 2px;
+}
