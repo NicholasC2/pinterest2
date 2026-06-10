@@ -19,9 +19,14 @@ function App() {
         <div className="row white-space">
 
         </div>
+        <div className="column account">
+          <a className="avatar">
+            <img src={placeholderImage}></img>
+          </a>
+        </div>
       </div>
       <div className="content">
-
+        
       </div>
     </>
   )
