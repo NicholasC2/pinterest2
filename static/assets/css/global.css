@@ -1,7 +1,12 @@
+html,
 body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
+
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
 }
 
 a,
