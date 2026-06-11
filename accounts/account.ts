@@ -1,19 +1,23 @@
-import { AccountOptions } from "./accountOptions";
 import * as argon2 from "argon2";
+import { Session } from "./session";
 
 export class Account {
     username: string;
     passwordHash: string;
-    accountOptions: AccountOptions;
+    accountOptions: Object;
+
+    sessions: Session[];
 
     constructor(
         username: string,
         passwordHash: string,
-        accountOptions: AccountOptions
+        accountOptions: Object,
+        sessions: Session[]
     ) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.accountOptions = accountOptions;
+        this.sessions = sessions;
     }
 
     async checkPassword(password: string): Promise<boolean> {
