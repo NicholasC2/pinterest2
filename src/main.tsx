@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 
-import App from "./app";
-import Login from "./login";
+import App from "./app.js";
+import Login from "./login.js";
 
-import '/static/navbar.css'
-import '/static/colors.css'
-import '/static/global.css'
+import "../static/navbar.css";
+import "../static/colors.css";
+import "../static/global.css";
 
-export default function Root() {
+function Root() {
   return (
     <BrowserRouter>
       <Routes>
@@ -19,4 +19,7 @@ export default function Root() {
   );
 }
 
-createRoot(document.getElementById("root")).render(<Root />);
+const container = document.getElementById("root")!;
+
+const root = createRoot(container);
+root.render(<Root />);
