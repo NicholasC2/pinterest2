@@ -2,14 +2,6 @@
   "name": "pinterest2",
   "version": "1.0.0",
   "description": "pinterest but 2",
-  "homepage": "https://github.com/NicholasC2/pinterest2#readme",
-  "bugs": {
-    "url": "https://github.com/NicholasC2/pinterest2/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/NicholasC2/pinterest2.git"
-  },
   "license": "ISC",
   "author": "NicholasC2",
   "type": "module",
@@ -26,6 +18,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "argon2": "^0.44.0",
+    "express": "^5.2.1",
+    "lowdb": "^7.0.1"
   }
 }

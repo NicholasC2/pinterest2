@@ -1,5 +1,7 @@
+import { LowSync } from "lowdb";
+import { JSONFileSync } from "lowdb/node";
+
 import * as argon2 from "argon2";
-import { Session } from "./session";
 
 export class Account {
     username: string;
@@ -30,3 +32,22 @@ export class Account {
         });
     }
 }
+
+export class Session {
+    id: string;
+    createdAt: number;
+
+    constructor(id: string, createdAt: number) {
+        this.id = id;
+        this.createdAt = createdAt;
+    }
+}
+
+type StoreData = {
+    accounts: Account[];
+}
+
+const adapter = new JSONFileSync<StoreData>('db.json')
+const db = new LowSync(adapter, {accounts: []});
+
+export default db;
