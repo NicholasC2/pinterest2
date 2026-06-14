@@ -1,0 +1,82 @@
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1rem;
+}
+
+.gallery > * {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.gallery > * > .interactions {
+    position: absolute;
+
+    bottom: 0;
+    width: 100%;
+
+}
+
+.interactions {
+    display: inline-flex;
+    background: rgba(0, 0, 0, 0.5);
+    flex-direction: row;
+    opacity: 0;
+    transition: opacity 50ms ease-in-out;
+}
+
+.gallery > *:hover > .interactions {
+    opacity: 1;
+}
+
+.interactions > * {
+    margin: 0.25rem;
+}
+
+.gallery img {
+    width: 100%;
+    height: 100%;
+}
+
+.gallery .placeholder {
+    background-color: var(--bg-secondary);
+    background-image: url("../images/placeholder.png");
+    background-repeat: no-repeat;
+    background-size: 50%;
+    background-position: 50%;
+
+    height: 200px;
+}
+
+.gallery .placeholder::after {
+    content: "";
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    
+    background: linear-gradient(
+        90deg,
+        var(--text-primary) 0%,
+        var(--bg-secondary) 50%,
+        var(--text-primary) 100%
+    );
+
+    background-size: 200% 100%;
+
+    opacity: 25%;
+
+    animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    from {
+        background-position: 100% 0;
+    }
+    to {
+        background-position: -100% 0;
+    }
+}
