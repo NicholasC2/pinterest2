@@ -16,10 +16,23 @@
             <div class="nav-links">
                 <a href="/" class="button">Home</a>
             </div>
+            <div class="navbar-spacer flex"></div>
+            <div class="search">
+                <input type="text" placeholder="Search">
+                <button>
+                    <img src="assets/images/search-light.svg">
+                </button>
+            </div>
+            <div class="account" onclick="this.classList.contains('open') ? this.classList.remove('open') : this.classList.add('open')">
+                <img src="assets/images/placeholder.png" class="avatar">
+                <img src="assets/images/arrow-down-light.svg" class="arrow">
+            </div>
         </nav>
 
         <div class="gallery">
-
+            <div class="col"></div>
+            <div class="col"></div>
+            <div class="col"></div>
         </div>
 
         <script src="assets/js/gallery.js"></script>

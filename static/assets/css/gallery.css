@@ -1,20 +1,32 @@
 .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-    padding: 1rem;
+    display: flex;
+    flex-direction: row;
 
     overflow-y: auto;
 }
 
-.gallery > * {
+.col {
+    display: inline-flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    padding: 0 0.5rem;
+}
+
+.gallery-item {
+    flex: 0 0 auto;
+    margin-top: 1rem;
+
+    break-inside: avoid;
+
     position: relative;
     border-radius: 10px;
     overflow: hidden;
     background: var(--bg-secondary);
 }
 
-.gallery > * > .interactions {
+.gallery-item > .interactions {
     position: absolute;
 
     bottom: 0;
@@ -30,7 +42,7 @@
     transition: opacity 50ms ease-in-out;
 }
 
-.gallery > *:hover > .interactions {
+.gallery-item:hover > .interactions {
     opacity: 1;
 }
 
@@ -38,18 +50,12 @@
     margin: 0.25rem;
 }
 
-.gallery img {
-    width: 100%;
-    height: 100%;
-}
-
-.gallery .loading {
+.loading {
     position: relative;
     overflow: hidden;
-    height: 200px;
 }
 
-.gallery .loading::after {
+.loading::after {
     content: "";
     position: absolute;
     inset: -50%;
