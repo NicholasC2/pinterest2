@@ -2,13 +2,16 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1rem;
-    margin: 1rem;
+    padding: 1rem;
+
+    overflow-y: auto;
 }
 
 .gallery > * {
     position: relative;
     border-radius: 10px;
     overflow: hidden;
+    background: var(--bg-secondary);
 }
 
 .gallery > * > .interactions {
@@ -40,43 +43,33 @@
     height: 100%;
 }
 
-.gallery .placeholder {
-    background-color: var(--bg-secondary);
-    background-image: url("../images/placeholder.png");
-    background-repeat: no-repeat;
-    background-size: 50%;
-    background-position: 50%;
-
+.gallery .loading {
+    position: relative;
+    overflow: hidden;
     height: 200px;
 }
 
-.gallery .placeholder::after {
+.gallery .loading::after {
     content: "";
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: -50%;
 
-    display: block;
-
-    
     background: linear-gradient(
         90deg,
-        var(--text-primary) 0%,
-        var(--bg-secondary) 50%,
-        var(--text-primary) 100%
+        transparent 35%,
+        rgba(255, 255, 255, 0.08) 50%,
+        transparent 65%
     );
 
-    background-size: 200% 100%;
-
-    opacity: 25%;
-
-    animation: shimmer 2s ease-in-out infinite;
+    transform: translateX(-65%);
+    animation: shimmer 2s ease-in infinite;
 }
 
 @keyframes shimmer {
     from {
-        background-position: 100% 0;
+        transform: translateX(-65%);
     }
     to {
-        background-position: -100% 0;
+        transform: translateX(150%);
     }
 }
