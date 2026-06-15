@@ -30,11 +30,19 @@
         </nav>
 
         <div class="gallery">
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col"></div>
+
         </div>
 
-        <script src="assets/js/gallery.js"></script>
+        <div id="load-more-trigger"></div>
+
+        <script src="assets/js/masonry.pkgd.min.js"></script>
+
+        <script>
+            const msnry = new Masonry(document.querySelector('.gallery'), {
+                itemSelector: '.gallery-item'
+            });
+        </script>
+
+        <script src="assets/js/loadSamples.js"></script>
     </body>
 </html>
