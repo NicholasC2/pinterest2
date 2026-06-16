@@ -2,6 +2,14 @@ import express from "express";
 import api from "./api";
 import path from "path";
 import { fileURLToPath } from 'url';
+import esbuild from "esbuild";
+
+esbuild.build({
+  entryPoints: ["src/client/index.ts"],
+  bundle: true,
+  minify: true,
+  outfile: "static/assets/js/client.js",
+}).catch(() => process.exit(1));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

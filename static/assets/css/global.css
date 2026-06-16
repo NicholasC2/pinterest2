@@ -88,3 +88,44 @@ hr {
     width: 100%;
     height: 100%;
 }
+
+.error-list {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 20px;
+}
+
+.error-message {
+    padding: 10px;
+    border-radius: 2px;
+
+    animation: FadeIn 200ms ease-in 1;
+}
+
+.error-message.success {
+    background-color: green;
+    border: 1px solid greenyellow;
+}
+
+.error-message.fail {
+    background-color: red;
+    border: 1px solid orangered;
+}
+
+.error-message.warn {
+    background-color: orange;
+    border: 1px solid yellow;
+}
+
+@keyframes FadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 100%;
+    }
+}
