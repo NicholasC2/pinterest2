@@ -11,14 +11,27 @@ async function loadImages(count = 20) {
 
         const cacheBuster = Math.floor(Math.random() * 10000);
 
+        const div = document.createElement("div");
+        div.className = "gallery-item";
+
         const img = document.createElement("img");
-        img.className = "gallery-item";
         img.src = `https://picsum.photos/${width}/${height}?random=${cacheBuster}`;
 
-        gallery.appendChild(img);
+        div.appendChild(img);
+        gallery.appendChild(div);
 
-        msnry._init()
+        msnry.appended([div]);
+
+        img.onload = () => {
+            msnry.layout();
+        }
     }
 }
 
-loadImages(30);
+function onScroll() {
+    if(gallery.scrollTop + gallery.clientHeight >= gallery.scrollHeight - 500) {
+        loadImages(10);
+    }
+}
+
+setInterval(onScroll, 1000);

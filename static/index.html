@@ -30,7 +30,7 @@
         </nav>
 
         <div class="gallery">
-
+            <div class="grid-sizer"></div>
         </div>
 
         <div id="load-more-trigger"></div>
@@ -39,7 +39,9 @@
 
         <script>
             const msnry = new Masonry(document.querySelector('.gallery'), {
-                itemSelector: '.gallery-item'
+                itemSelector: '.gallery-item',
+                columnWidth: '.grid-sizer',
+                percentPosition: true,
             });
         </script>
 

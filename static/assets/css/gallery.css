@@ -1,12 +1,39 @@
 .gallery {
     margin: 20px;
+    overflow-y: auto;
 }
 
+.grid-sizer,
 .gallery-item {
-    width: 300px;
+    width: 25%;
+    padding: 5px;
+    box-sizing: border-box;
+}
 
+.gallery-item img {
+    display: block;
+    width: 100%;
     height: auto;
-
-    margin-bottom: 16px;
     border-radius: 12px;
+}
+
+@media (max-width: 1200px) {
+    .grid-sizer,
+    .gallery-item {
+        width: 33.333%;
+    }
+}
+
+@media (max-width: 800px) {
+    .grid-sizer,
+    .gallery-item {
+        width: 50%;
+    }
+}
+
+@media (max-width: 500px) {
+    .grid-sizer,
+    .gallery-item {
+        width: 100%;
+    }
 }
