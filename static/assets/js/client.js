@@ -1,1 +1,46 @@
-"use strict";(()=>{var o=document.querySelector("div.error-list"),i=document.querySelector("input.fileInput");i instanceof HTMLInputElement&&i.addEventListener("input",e=>{if(i.files)for(let t=0;t<i.files.length;t++){let n=i.files[t];console.log(n)}});function r(e,t){o||(o=document.createElement("div"),o.className="error-list",document.body.appendChild(o));let n=document.createElement("div");n.innerHTML=t,n.className="error-message "+e,o.appendChild(n)}fetch("/api").catch(()=>{r("fail","Server Connection Failed! Reloading..."),setTimeout(()=>location.reload(),1e3)}).then(async e=>{e&&e.status!=200&&(r("fail","Server Connection Failed! Reloading..."),setTimeout(()=>location.reload(),1e3))});})();
+"use strict";
+(() => {
+  // src/client/index.ts
+  var errorList = document.querySelector("div.error-list");
+  var fileInput = document.querySelector("input.fileInput");
+  if (fileInput instanceof HTMLInputElement) {
+    fileInput.addEventListener("input", async (ev) => {
+      if (!fileInput.files) return;
+      for (let i = 0; i < fileInput.files.length; i++) {
+        const file = fileInput.files[i];
+        fetch("./api/upload", {
+          method: "POST",
+          body: JSON.stringify({
+            type: 1 /* UPLOAD_IMAGE */,
+            data: {
+              fileName: file.name,
+              base64: btoa(await file.text())
+            }
+          })
+        });
+      }
+    });
+  }
+  function showError(type, message) {
+    if (!errorList) {
+      errorList = document.createElement("div");
+      errorList.className = "error-list";
+      document.body.appendChild(errorList);
+    }
+    const error = document.createElement("div");
+    error.innerHTML = message;
+    error.className = "error-message " + type;
+    errorList.appendChild(error);
+  }
+  fetch("/api").catch(() => {
+    showError("fail" /* FAIL */, "Server Connection Failed! Reloading...");
+    setTimeout(() => location.reload(), 1e3);
+  }).then(async (res) => {
+    if (res) {
+      if (res.status != 200) {
+        showError("fail" /* FAIL */, "Server Connection Failed! Reloading...");
+        setTimeout(() => location.reload(), 1e3);
+      }
+    }
+  });
+})();

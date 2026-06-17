@@ -1,17 +1,27 @@
 import { Account, Session } from "../database/database";
-import {  } from "../apiTypes";
+import { MessageToServerType } from "../apiTypes";
+import msnry, { addImage } from "./masonry";
 
 let errorList = document.querySelector("div.error-list")
 
 let fileInput = document.querySelector("input.fileInput")
 
 if(fileInput instanceof HTMLInputElement) {
-    fileInput.addEventListener("input", (ev)=>{
+    fileInput.addEventListener("input", async(ev)=>{
         if(!fileInput.files) return;
         for(let i = 0; i < fileInput.files.length; i++) {
             const file = fileInput.files[i]
 
-            console.log(file)
+            fetch("./api/upload", {
+                method: "POST",
+                body: JSON.stringify({
+                    type: MessageToServerType.UPLOAD_IMAGE,
+                    data: {
+                        fileName: file.name,
+                        base64: btoa(await file.text())
+                    }
+                })
+            })
         }
     })
 }

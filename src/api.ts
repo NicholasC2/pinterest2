@@ -8,7 +8,7 @@ function handleServerMessage(message: MessageToServer): MessageToClient {
     switch(message.type) {
         case MessageToServerType.UPLOAD_IMAGE: {
             const { base64, fileName } = message.data
-            
+
             if(fileName.includes("..")) {
                 return {
                     type: MessageToClientType.FAIL,
