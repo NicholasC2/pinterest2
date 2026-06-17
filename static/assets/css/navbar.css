@@ -34,30 +34,10 @@
 .navbar > .account {
   display: inline-flex;
   flex-direction: row;
-  height: 80%;
   box-sizing: border-box;
-  padding: 3px;
+
+  gap: 10px;
 
   cursor: pointer;
   user-select: none;
-
-  margin: 1rem;
-}
-
-.navbar > .account > .arrow {
-  transition: transform 100ms ease-in-out;
-  margin: 20px;
-  margin-left: 10px;
-  width: auto;
-  height: auto;
-  box-sizing: border-box;
-}
-
-.navbar > .account.open > .arrow {
-  transform: rotate(180deg);
-}
-
-.navbar > .account > .avatar {
-  aspect-ratio: 1;
-  border-radius: 50%;
 }

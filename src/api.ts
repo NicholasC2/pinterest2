@@ -20,13 +20,10 @@ export default function(req: Request, res: Response, next: NextFunction) {
             data: req.body.data ?? {},
         })
 
-        if(response.type == MessageToClientType.FAIL) {
-            res.sendStatus(418);
-        } else {
-            res.send(response.data);
-        }
+        res.setHeader("content-type", "application/json")
+        res.end(JSON.stringify(response, null, 4));
     } else if(req.url.startsWith("/api")) {
-        res.send({version: 0.1});
+        res.end({version: 0.1});
     } else {
         next();
     }

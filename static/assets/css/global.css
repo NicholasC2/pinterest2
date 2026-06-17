@@ -129,3 +129,21 @@ hr {
         opacity: 100%;
     }
 }
+
+.panel {
+    display: inline-flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    background-color: var(--bg-secondary);
+
+    padding: 30px;
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
