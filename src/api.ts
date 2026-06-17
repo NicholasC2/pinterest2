@@ -1,27 +1,8 @@
 import { NextFunction, Request, Response } from "express"
-import db from "./database/database"
-import { ErrorToClientType, MessageToClient, MessageToClientType, MessageToServer, MessageToServerType } from "./apiTypes"
-
-import { writeFileSync } from "fs";
+import { ErrorToClientType, MessageToClient, MessageToClientType, MessageToServer } from "./apiTypes"
 
 function handleServerMessage(message: MessageToServer): MessageToClient {
     switch(message.type) {
-        case MessageToServerType.UPLOAD_IMAGE: {
-            const { base64, fileName } = message.data
-
-            if(fileName.includes("..")) {
-                return {
-                    type: MessageToClientType.FAIL,
-                    data: ErrorToClientType.UPLOAD_FILENAME_NOT_ALLOWED
-                }
-            }
-
-            writeFileSync("uploads/"+fileName, atob(base64));
-
-            return {
-                type: MessageToClientType.SUCCESS
-            }
-        }
 
         default: {
             return {

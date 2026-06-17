@@ -1,30 +1,7 @@
-import { Account, Session } from "../database/database";
-import { MessageToServerType } from "../apiTypes";
-import msnry, { addImage } from "./masonry";
+import argon2 from "argon2-browser";
+import { MessageToServer } from "../apiTypes"
 
 let errorList = document.querySelector("div.error-list")
-
-let fileInput = document.querySelector("input.fileInput")
-
-if(fileInput instanceof HTMLInputElement) {
-    fileInput.addEventListener("input", async(ev)=>{
-        if(!fileInput.files) return;
-        for(let i = 0; i < fileInput.files.length; i++) {
-            const file = fileInput.files[i]
-
-            fetch("./api/upload", {
-                method: "POST",
-                body: JSON.stringify({
-                    type: MessageToServerType.UPLOAD_IMAGE,
-                    data: {
-                        fileName: file.name,
-                        base64: btoa(await file.text())
-                    }
-                })
-            })
-        }
-    })
-}
 
 enum HTMLErrorType {
     SUCCESS = "success",
@@ -46,14 +23,26 @@ function showError(type: HTMLErrorType, message: string) {
     errorList.appendChild(error);
 }
 
-fetch("/api").catch(()=>{
-    showError(HTMLErrorType.FAIL, "Server Connection Failed! Reloading...");
-    setTimeout(()=>location.reload(), 1000);
-}).then(async(res) => {
-    if(res) {
-        if(res.status != 200) {
-            showError(HTMLErrorType.FAIL, "Server Connection Failed! Reloading...");
-            setTimeout(()=>location.reload(), 1000);
-        }
-    }
-})
+async function PostAPI(msg: MessageToServer) {
+    return (await fetch("./api", {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(msg)
+    })).
+}
+
+export async function createAccount(username: string, password: string) {
+    const passwordHash = await argon2.hash({
+        pass: password,
+        type: argon2.ArgonType.Argon2id,
+        mem: 65536,
+        time: 3,
+        parallelism: 1,
+        hashLen: 32,
+        salt: window.crypto.getRandomValues(new Uint8Array(length))
+    });
+
+
+}
