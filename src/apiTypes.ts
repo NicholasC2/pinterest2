@@ -18,6 +18,10 @@ export enum ErrorToClientType {
     UNKNOWN,
     
     INTERNAL_ERROR,
+
+    ACCOUNT_EXISTS,
+    ACCOUNT_DOESNT_EXIST,
+    ACCOUNT_PASSWORD_INVALID
 }
 
 export type MessageToClient = | {
@@ -40,7 +44,7 @@ export type MessageToServer = | {
     type: MessageToServerType.ACCOUNT_CREATE,
     data: {
         username: string;
-        password: string;
+        passwordHash: string;
         profile: Profile;
     }
 } | {

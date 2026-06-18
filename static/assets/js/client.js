@@ -681,7 +681,7 @@
       type: 2 /* ACCOUNT_CREATE */,
       data: {
         username,
-        password: passwordHash,
+        passwordHash,
         profile
       }
     });
@@ -723,7 +723,11 @@
     }
     async function createACC() {
       if (passwordInput.value.trim().length < 5) {
-        setStatus("red", "Password cannot be less than 5 characters");
+        setStatus("red", "Password cannot be\n less than 5 characters");
+        return;
+      }
+      if (usernameInput.value.trim().length === 0) {
+        setStatus("red", "Username cannot be blank");
         return;
       }
       if (await checkUsername(usernameInput.value)) {
@@ -731,7 +735,18 @@
         return;
       }
       setStatus();
-      await createAccount(usernameInput.value, passwordInput.value, {});
+      const response = await createAccount(usernameInput.value, passwordInput.value, {});
+      if (response.type == 0 /* SUCCESS */) {
+        setStatus("green", "Account Created Successfully!");
+        setTimeout(() => location.reload(), 500);
+      } else if (response.type == 1 /* FAIL */) {
+        if (response.data == 4 /* ACCOUNT_PASSWORD_INVALID */) {
+          setStatus("red", "Password cannot be\n less than 5 characters");
+        }
+        if (response.data == 2 /* ACCOUNT_EXISTS */) {
+          setStatus("red", "Username Taken");
+        }
+      }
     }
     passwordInput.addEventListener("input", async () => {
       setStatus();
@@ -748,7 +763,12 @@
       }
     });
     signupButton2.addEventListener("click", createACC);
-    openPanel([usernameInput, passwordInput, signupButton2, status]);
+    const panel2 = openPanel([usernameInput, passwordInput, signupButton2, status]);
+    panel2.addEventListener("keydown", (ev) => {
+      if (ev.key == "Enter") {
+        createACC();
+      }
+    });
   });
 })();
 /*! Bundled license information:

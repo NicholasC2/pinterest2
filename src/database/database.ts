@@ -75,7 +75,7 @@ type StoreData = {
     images: ImageStore[];
 }
 
-const adapter = new JSONFileSync<StoreData>('db.json')
+const adapter = new JSONFileSync<StoreData>('./db.json')
 const db = new LowSync(adapter, {accounts: [], sessions: [], images: []});
 
 export default db;

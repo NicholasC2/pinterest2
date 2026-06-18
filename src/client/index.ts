@@ -1,5 +1,5 @@
 import { argon2id } from 'hash-wasm';
-import { MessageToClient, MessageToClientType, MessageToServer, MessageToServerType } from "../apiTypes"
+import { ErrorToClientType, MessageToClient, MessageToClientType, MessageToServer, MessageToServerType } from "../apiTypes"
 import { openPanel } from './panels';
 import { Profile } from '../database/database';
 
@@ -56,7 +56,7 @@ async function createAccount(username: string, password: string, profile: Profil
         type: MessageToServerType.ACCOUNT_CREATE,
         data: {
             username,
-            password: passwordHash,
+            passwordHash,
             profile
         }
     });
@@ -110,7 +110,12 @@ signupButton?.addEventListener("click", async(event)=>{
 
     async function createACC() {
         if(passwordInput.value.trim().length < 5) {
-            setStatus("red", "Password cannot be less than 5 characters");
+            setStatus("red", "Password cannot be\n less than 5 characters");
+            return;
+        }
+
+        if(usernameInput.value.trim().length === 0) {
+            setStatus("red", "Username cannot be blank");
             return;
         }
 
@@ -121,7 +126,20 @@ signupButton?.addEventListener("click", async(event)=>{
 
         setStatus();
         
-        await createAccount(usernameInput.value, passwordInput.value, {});
+        const response = await createAccount(usernameInput.value, passwordInput.value, {});
+
+        if(response.type == MessageToClientType.SUCCESS) {
+            setStatus("green", "Account Created Successfully!");
+            setTimeout(() => location.reload(), 500)
+        } else if(response.type == MessageToClientType.FAIL) {
+            if(response.data == ErrorToClientType.ACCOUNT_PASSWORD_INVALID) {
+                setStatus("red", "Password cannot be\n less than 5 characters");
+            }
+
+            if(response.data == ErrorToClientType.ACCOUNT_EXISTS) {
+                setStatus("red", "Username Taken");
+            }
+        }
     }
 
     passwordInput.addEventListener("input", async()=>{
@@ -141,7 +159,12 @@ signupButton?.addEventListener("click", async(event)=>{
     });
 
     signupButton.addEventListener("click", createACC)
-    
 
-    openPanel([usernameInput, passwordInput, signupButton, status]);
+    const panel = openPanel([usernameInput, passwordInput, signupButton, status]);
+
+    panel.addEventListener("keydown", (ev)=>{
+        if(ev.key == "Enter") {
+            createACC()
+        }
+    })
 })
