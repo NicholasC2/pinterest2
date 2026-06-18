@@ -625,20 +625,35 @@
   var mutex = new Mutex();
 
   // src/client/panels.ts
-  function createPanel(elements) {
-    const panel2 = document.createElement("div");
-    elements.forEach((element) => {
-      panel2.appendChild(element);
+  var panel = document.createElement("div");
+  function openPanel(elements) {
+    panel.remove();
+    const panelBackground = document.createElement("div");
+    panelBackground.className = "panel-background";
+    document.body.appendChild(panelBackground);
+    panel.className = "panel";
+    document.body.appendChild(panel);
+    panel.replaceChildren(...elements);
+    function closePanel() {
+      panel.remove();
+      panelBackground.remove();
+    }
+    const closeButton = document.createElement("button");
+    closeButton.onclick = closePanel;
+    panel.tabIndex = -1;
+    panel.focus();
+    panelBackground.addEventListener("click", (e) => {
+      closePanel();
     });
-    return panel2;
+    closeButton.className = "close";
+    closeButton.innerHTML = "x";
+    panel.appendChild(closeButton);
+    return panel;
   }
 
   // src/client/index.ts
-  var panel = document.createElement("div");
-  panel.className = "panel";
-  document.body.appendChild(panel);
   var errorList = document.querySelector("div.error-list");
-  async function PostAPI(msg) {
+  async function sendAPIMessage(msg) {
     const res = await fetch("./api", {
       headers: {
         "Content-Type": "application/json"
@@ -652,7 +667,7 @@
       throw new Error("Server Error!");
     }
   }
-  async function createAccount(username, password) {
+  async function createAccount(username, password, profile) {
     const passwordHash = await argon2id({
       password,
       salt: window.crypto.getRandomValues(new Uint8Array(16)),
@@ -662,31 +677,78 @@
       hashLength: 32,
       outputType: "hex"
     });
-    const response = await PostAPI({
-      type: 0 /* NONE */
+    return await sendAPIMessage({
+      type: 2 /* ACCOUNT_CREATE */,
+      data: {
+        username,
+        password: passwordHash,
+        profile
+      }
     });
-    switch (response.type) {
-      case 1 /* FAIL */: {
-        throw response.data;
+  }
+  async function checkUsername(username) {
+    return (await sendAPIMessage({
+      type: 3 /* ACCOUNT_CHECK_USERNAME */,
+      data: {
+        username
       }
-      case 0 /* SUCCESS */: {
-        return response.data;
-      }
-      default: {
-        throw new Error("Unknown Response");
-      }
-    }
+    })).data === true;
   }
   var loginButton = document.querySelector(".login");
   var signupButton = document.querySelector(".signup");
-  loginButton?.addEventListener("click", (event) => {
+  loginButton?.addEventListener("click", async (event) => {
     const usernameInput = document.createElement("input");
     usernameInput.placeholder = "username";
     const passwordInput = document.createElement("input");
     passwordInput.type = "password";
     passwordInput.placeholder = "password";
-    const loginPanel = createPanel([usernameInput, passwordInput]);
-    panel.innerHTML = loginPanel.innerHTML;
+    const loginButton2 = document.createElement("button");
+    loginButton2.innerText = "login";
+    openPanel([usernameInput, passwordInput, loginButton2]);
+  });
+  signupButton?.addEventListener("click", async (event) => {
+    const usernameInput = document.createElement("input");
+    usernameInput.placeholder = "username";
+    const passwordInput = document.createElement("input");
+    passwordInput.type = "password";
+    passwordInput.placeholder = "password";
+    const signupButton2 = document.createElement("button");
+    signupButton2.innerText = "signup";
+    const status = document.createElement("div");
+    status.style.color = "red";
+    status.style.textWrap = "break-word";
+    function setStatus(color = "transparent", text = "") {
+      status.innerText = text;
+      status.style.color = color;
+    }
+    async function createACC() {
+      if (passwordInput.value.trim().length < 5) {
+        setStatus("red", "Password cannot be less than 5 characters");
+        return;
+      }
+      if (await checkUsername(usernameInput.value)) {
+        setStatus("red", "Username Taken");
+        return;
+      }
+      setStatus();
+      await createAccount(usernameInput.value, passwordInput.value, {});
+    }
+    passwordInput.addEventListener("input", async () => {
+      setStatus();
+    });
+    usernameInput.addEventListener("input", async () => {
+      if (usernameInput.value.trim().length === 0) {
+        setStatus("red", "Username cannot be blank");
+        return;
+      }
+      if (await checkUsername(usernameInput.value)) {
+        setStatus("red", "Username taken");
+      } else {
+        setStatus("green", "Username available");
+      }
+    });
+    signupButton2.addEventListener("click", createACC);
+    openPanel([usernameInput, passwordInput, signupButton2, status]);
   });
 })();
 /*! Bundled license information:

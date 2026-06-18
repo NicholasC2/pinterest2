@@ -1,10 +1,7 @@
 import { argon2id } from 'hash-wasm';
 import { MessageToClient, MessageToClientType, MessageToServer, MessageToServerType } from "../apiTypes"
-import { createPanel } from './panels';
-
-let panel = document.createElement("div");
-panel.className = "panel";
-document.body.appendChild(panel);
+import { openPanel } from './panels';
+import { Profile } from '../database/database';
 
 let errorList = document.querySelector("div.error-list")
 
@@ -28,7 +25,7 @@ function showError(type: HTMLErrorType, message: string) {
     errorList.appendChild(error);
 }
 
-async function PostAPI(msg: MessageToServer): Promise<MessageToClient> {
+async function sendAPIMessage(msg: MessageToServer): Promise<MessageToClient> {
     const res = (await fetch("./api", {
         headers: {
             "Content-Type": "application/json"
@@ -44,7 +41,7 @@ async function PostAPI(msg: MessageToServer): Promise<MessageToClient> {
     }
 }
 
-export async function createAccount(username: string, password: string) {
+async function createAccount(username: string, password: string, profile: Profile) {
     const passwordHash = await argon2id({
         password,
         salt: window.crypto.getRandomValues(new Uint8Array(16)),
@@ -55,29 +52,29 @@ export async function createAccount(username: string, password: string) {
         outputType: 'hex'
     });
 
-    const response = await PostAPI({
-        type: MessageToServerType.NONE
+    return await sendAPIMessage({
+        type: MessageToServerType.ACCOUNT_CREATE,
+        data: {
+            username,
+            password: passwordHash,
+            profile
+        }
     });
+}
 
-    switch(response.type) {
-        case MessageToClientType.FAIL: {
-            throw response.data;
+async function checkUsername(username: string): Promise<Boolean> {
+    return (await sendAPIMessage({
+        type: MessageToServerType.ACCOUNT_CHECK_USERNAME,
+        data: {
+            username
         }
-
-        case MessageToClientType.SUCCESS: {
-            return response.data;
-        }
-
-        default: {
-            throw new Error("Unknown Response")
-        }
-    }
+    })).data === true;
 }
 
 const loginButton = document.querySelector(".login")
 const signupButton = document.querySelector(".signup")
 
-loginButton?.addEventListener("click", (event)=>{
+loginButton?.addEventListener("click", async(event)=>{
     const usernameInput = document.createElement("input");
     usernameInput.placeholder = "username";
 
@@ -85,7 +82,66 @@ loginButton?.addEventListener("click", (event)=>{
     passwordInput.type = "password";
     passwordInput.placeholder = "password";
 
-    const loginPanel = createPanel([usernameInput, passwordInput]);
+    const loginButton = document.createElement("button");
+    loginButton.innerText = "login";
+
+    openPanel([usernameInput, passwordInput, loginButton]);
+})
+
+signupButton?.addEventListener("click", async(event)=>{
+    const usernameInput = document.createElement("input");
+    usernameInput.placeholder = "username";
+
+    const passwordInput = document.createElement("input");
+    passwordInput.type = "password";
+    passwordInput.placeholder = "password";
+
+    const signupButton = document.createElement("button");
+    signupButton.innerText = "signup";
+
+    const status = document.createElement("div");
+    status.style.color = "red";
+    status.style.textWrap = "break-word"
+
+    function setStatus(color: string = "transparent", text: string = "") {
+        status.innerText = text;
+        status.style.color = color;
+    }
+
+    async function createACC() {
+        if(passwordInput.value.trim().length < 5) {
+            setStatus("red", "Password cannot be less than 5 characters");
+            return;
+        }
+
+        if(await checkUsername(usernameInput.value)) {
+            setStatus("red", "Username Taken");
+            return;
+        }
+
+        setStatus();
+        
+        await createAccount(usernameInput.value, passwordInput.value, {});
+    }
+
+    passwordInput.addEventListener("input", async()=>{
+        setStatus()
+    })
+
+    usernameInput.addEventListener("input", async()=>{
+        if(usernameInput.value.trim().length === 0) {
+            setStatus("red", "Username cannot be blank");
+            return;
+        }
+        if(await checkUsername(usernameInput.value)) {
+            setStatus("red", "Username taken");
+        } else {
+            setStatus("green", "Username available");
+        }
+    });
+
+    signupButton.addEventListener("click", createACC)
     
-    panel.innerHTML = loginPanel.innerHTML
+
+    openPanel([usernameInput, passwordInput, signupButton, status]);
 })

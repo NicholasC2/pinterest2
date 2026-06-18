@@ -6,20 +6,24 @@ import * as argon2 from "argon2";
 export class Account {
     username: string;
     passwordHash: string;
-    accountOptions: Object;
+    profile: Profile;
     createdAt: number;
 
     constructor(
         username: string,
         passwordHash: string,
-        accountOptions: Object,
+        profile: Profile,
         createdAt: number
     ) {
         this.username = username;
         this.passwordHash = passwordHash;
-        this.accountOptions = accountOptions;
+        this.profile = profile;
         this.createdAt = createdAt;
     }
+}
+
+export class Profile {
+
 }
 
 export async function checkPassword(account: Account, password: string): Promise<boolean> {
