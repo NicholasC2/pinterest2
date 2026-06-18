@@ -30,6 +30,7 @@ async function sendAPIMessage(msg: MessageToServer): Promise<MessageToClient> {
         headers: {
             "Content-Type": "application/json"
         },
+        credentials: "include",
         method: "POST",
         body: JSON.stringify(msg)
     }))
@@ -39,6 +40,12 @@ async function sendAPIMessage(msg: MessageToServer): Promise<MessageToClient> {
     } else {
         throw new Error("Server Error!")
     }
+}
+
+async function getAccount() {
+    return await sendAPIMessage({
+        type: MessageToServerType.ACCOUNT_GET_CURRENT
+    })
 }
 
 async function createAccount(username: string, password: string, profile: Profile) {
@@ -206,3 +213,65 @@ signupButton?.addEventListener("click", async(event)=>{
         }
     })
 })
+
+;(async ()=>{
+    const response = await getAccount();
+
+    if(response.type == MessageToClientType.SUCCESS && response.data) {
+        const accountElem = document.querySelector(".navbar > .account")
+
+        if(accountElem) {
+            const accountAvatar = document.createElement("div");
+            accountAvatar.className = "avatar"
+
+            const accountAvatarIMG = document.createElement("img");
+            if(response.data["profile"].imageURL) {
+                accountAvatarIMG.src = response.data["profile"].imageURL;
+            } else {
+                accountAvatarIMG.src = "/assets/images/placeholder.png"
+            }
+
+            accountAvatar.appendChild(accountAvatarIMG);
+
+            accountElem.replaceChildren(accountAvatar);
+
+            accountElem.addEventListener("click", ()=>{
+                let accountMenuToRemove = document.querySelector(".account-menu");
+
+                if(accountMenuToRemove) {
+                    accountMenuToRemove.remove();
+                } else {
+                    const accountMenu = document.createElement("div");
+                    accountMenu.className = "account-menu"
+
+                    const usernameLabel = document.createElement("div");
+                    usernameLabel.innerText = response.data?.["username"];
+    
+                    const logoutButton = document.createElement("button");
+                    logoutButton.innerHTML = "logout";
+                    logoutButton.addEventListener("click", async()=>{
+                        const response = await sendAPIMessage({
+                            type: MessageToServerType.ACCOUNT_LOGOUT
+                        })
+
+                        if(response.type == MessageToClientType.SUCCESS) {
+                            location.reload();
+                        }
+                    })
+    
+                    accountMenu.replaceChildren(usernameLabel, logoutButton);
+
+                    accountMenu.tabIndex = -1;
+                    accountMenu.focus();
+                    
+                    accountMenu.addEventListener("blur", (ev)=>{
+                        if(ev.target == accountMenu) return;
+                        accountMenu.remove();
+                    })
+
+                    document.body.appendChild(accountMenu);
+                }
+            })
+        }
+    }
+})();

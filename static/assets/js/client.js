@@ -658,6 +658,7 @@
       headers: {
         "Content-Type": "application/json"
       },
+      credentials: "include",
       method: "POST",
       body: JSON.stringify(msg)
     });
@@ -666,6 +667,11 @@
     } else {
       throw new Error("Server Error!");
     }
+  }
+  async function getAccount() {
+    return await sendAPIMessage({
+      type: 3 /* ACCOUNT_GET_CURRENT */
+    });
   }
   async function createAccount(username, password, profile) {
     const passwordHash = await argon2id({
@@ -688,7 +694,7 @@
   }
   async function checkUsername(username) {
     return (await sendAPIMessage({
-      type: 3 /* ACCOUNT_CHECK_USERNAME */,
+      type: 4 /* ACCOUNT_CHECK_USERNAME */,
       data: {
         username
       }
@@ -801,6 +807,53 @@
       }
     });
   });
+  (async () => {
+    const response = await getAccount();
+    if (response.type == 0 /* SUCCESS */ && response.data) {
+      const accountElem = document.querySelector(".navbar > .account");
+      if (accountElem) {
+        const accountAvatar = document.createElement("div");
+        accountAvatar.className = "avatar";
+        const accountAvatarIMG = document.createElement("img");
+        if (response.data["profile"].imageURL) {
+          accountAvatarIMG.src = response.data["profile"].imageURL;
+        } else {
+          accountAvatarIMG.src = "/assets/images/placeholder.png";
+        }
+        accountAvatar.appendChild(accountAvatarIMG);
+        accountElem.replaceChildren(accountAvatar);
+        accountElem.addEventListener("click", () => {
+          let accountMenuToRemove = document.querySelector(".account-menu");
+          if (accountMenuToRemove) {
+            accountMenuToRemove.remove();
+          } else {
+            const accountMenu = document.createElement("div");
+            accountMenu.className = "account-menu";
+            const usernameLabel = document.createElement("div");
+            usernameLabel.innerText = response.data?.["username"];
+            const logoutButton = document.createElement("button");
+            logoutButton.innerHTML = "logout";
+            logoutButton.addEventListener("click", async () => {
+              const response2 = await sendAPIMessage({
+                type: 5 /* ACCOUNT_LOGOUT */
+              });
+              if (response2.type == 0 /* SUCCESS */) {
+                location.reload();
+              }
+            });
+            accountMenu.replaceChildren(usernameLabel, logoutButton);
+            accountMenu.tabIndex = -1;
+            accountMenu.focus();
+            accountMenu.addEventListener("blur", (ev) => {
+              if (ev.target == accountMenu) return;
+              accountMenu.remove();
+            });
+            document.body.appendChild(accountMenu);
+          }
+        });
+      }
+    }
+  })();
 })();
 /*! Bundled license information:
 
