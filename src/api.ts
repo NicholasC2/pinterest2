@@ -3,9 +3,12 @@ import { ErrorToClientType, MessageToClient, MessageToClientType, MessageToServe
 import db, { Account, Session } from "./database/database"
 import { argon2Verify } from "hash-wasm";
 
-async function handleServerMessage(message: MessageToServer): Promise<MessageToClient> {
-    db.read();
+type LoginResult = {
+    response: MessageToClient;
+    session?: Session | null;
+};
 
+async function handleServerMessage(message: MessageToServer, session: Session | null): Promise<LoginResult> {
     function createSession(username: string): Session {
         let ssid = crypto.randomUUID();
 
@@ -13,7 +16,12 @@ async function handleServerMessage(message: MessageToServer): Promise<MessageToC
             ssid = crypto.randomUUID();
         }
 
-        return new Session(ssid, Date.now(), username);
+        const session = new Session(ssid, Date.now(), username);
+
+        db.data.sessions.push(session);
+        db.write();
+
+        return session;
     }
 
     switch(message.type) {
@@ -23,8 +31,10 @@ async function handleServerMessage(message: MessageToServer): Promise<MessageToC
             const account = db.data.accounts.find(a => a.username === username);
 
             return {
-                type: MessageToClientType.SUCCESS,
-                data: account !== undefined
+                response: {
+                    type: MessageToClientType.SUCCESS,
+                    data: account !== undefined
+                }
             }
         }
 
@@ -35,18 +45,23 @@ async function handleServerMessage(message: MessageToServer): Promise<MessageToC
 
             if(account) {
                 return {
-                    type: MessageToClientType.FAIL,
-                    data: ErrorToClientType.ACCOUNT_EXISTS
+                    response: {
+                        type: MessageToClientType.FAIL,
+                        data: ErrorToClientType.ACCOUNT_EXISTS
+                    }
                 }
             }
 
             const newAccount = new Account(username, passwordHash, profile, Date.now());
 
             db.data.accounts.push(newAccount);
+            db.write();
 
             return {
-                type: MessageToClientType.SUCCESS,
-                data: createSession(username)
+                response: {
+                    type: MessageToClientType.SUCCESS
+                },
+                session: createSession(username)
             }
         }
 
@@ -57,49 +72,109 @@ async function handleServerMessage(message: MessageToServer): Promise<MessageToC
 
             if(!account) {
                 return {
-                    type: MessageToClientType.FAIL,
-                    data: ErrorToClientType.ACCOUNT_DOESNT_EXIST
+                    response: {
+                        type: MessageToClientType.FAIL,
+                        data: ErrorToClientType.ACCOUNT_DOESNT_EXIST
+                    }
                 }
             }
 
-            if(await argon2Verify({
-                password: password,
-                hash: account.passwordHash
-            })) {
-                return {
+            try {
+                if(await argon2Verify({
+                    hash: account.passwordHash,
+                    password: password,
+                })) {
+                    return {
+                        response: {
+                            type: MessageToClientType.SUCCESS
+                        },
+                        session: createSession(username)
+                    }
+                } else {
+                    return {
+                        response: {
+                            type: MessageToClientType.FAIL,
+                            data: ErrorToClientType.ACCOUNT_PASSWORD_INVALID
+                        }
+                    }
+                }
+            } catch {}
+        }
+
+        case MessageToServerType.ACCOUNT_LOGOUT: {
+            if (session) {
+                db.data.sessions =
+                    db.data.sessions.filter(s => s.id !== session.id);
+
+                db.write();
+            }
+
+            return {
+                response: {
                     type: MessageToClientType.SUCCESS,
-                    data: createSession(username)
+                },
+                session: null
+            }
+        }
+
+        case MessageToServerType.ACCOUNT_GET_CURRENT: {
+            const account = db.data.accounts.find(a => a.username === session?.username)
+
+            if(account) {
+                const { passwordHash, ...safeAccount } = account; // removes passwordHash from response
+
+                return {
+                    response: {
+                        type: MessageToClientType.SUCCESS,
+                        data: safeAccount
+                    }
                 }
             } else {
                 return {
-                    type: MessageToClientType.FAIL,
-                    data: ErrorToClientType.ACCOUNT_PASSWORD_INVALID
+                    response: {
+                        type: MessageToClientType.FAIL,
+                        data: ErrorToClientType.ACCOUNT_DOESNT_EXIST
+                    }
                 }
             }
         }
 
         default: {
             return {
-                type: MessageToClientType.FAIL,
-                data: ErrorToClientType.INTERNAL_ERROR
+                response: {
+                    type: MessageToClientType.FAIL,
+                    data: ErrorToClientType.INTERNAL_ERROR
+                }
             }
         }
     }
-
-    db.write();
 }
 
 export default async function(req: Request, res: Response, next: NextFunction) {
     if(req.url.startsWith("/api") && req.method === "POST") {
-        const response = await handleServerMessage({
+        db.read();
+
+        const result = await handleServerMessage({
             type: req.body.type ?? 0,
             data: req.body.data ?? {},
-        })
+        }, db.data.sessions.find(s => s.id === req.cookies.session) ?? null)
 
-        res.setHeader("content-type", "application/json")
-        res.end(JSON.stringify(response, null, 4));
+        if (result.session != undefined) {
+            if(result.session === null) {
+                res.clearCookie("session");
+            } else {
+                res.cookie("session", result.session.id, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "strict",
+                    maxAge: 1000 * 60 * 60 * 24 * 7
+                });
+            }
+        }
+
+        res.json(result.response);
     } else if(req.url.startsWith("/api")) {
-        res.end({version: 0.1});
+        res.json({version: 0.1});
     } else {
         next();
     }

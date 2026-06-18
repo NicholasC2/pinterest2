@@ -6,7 +6,9 @@ export enum MessageToServerType {
     ACCOUNT_LOGIN,
     ACCOUNT_CREATE,
 
+    ACCOUNT_GET_CURRENT,
     ACCOUNT_CHECK_USERNAME,
+    ACCOUNT_LOGOUT,
 }
 
 export enum MessageToClientType {
@@ -53,4 +55,6 @@ export type MessageToServer = | {
         username: string;
         password: string;
     }
+} | {
+    type: MessageToServerType.ACCOUNT_LOGOUT | MessageToServerType.ACCOUNT_GET_CURRENT
 }

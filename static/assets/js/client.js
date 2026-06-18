@@ -675,7 +675,7 @@
       iterations: 3,
       memorySize: 65536,
       hashLength: 32,
-      outputType: "hex"
+      outputType: "encoded"
     });
     return await sendAPIMessage({
       type: 2 /* ACCOUNT_CREATE */,
@@ -694,6 +694,15 @@
       }
     })).data === true;
   }
+  async function login(username, password) {
+    return await sendAPIMessage({
+      type: 1 /* ACCOUNT_LOGIN */,
+      data: {
+        username,
+        password
+      }
+    });
+  }
   var loginButton = document.querySelector(".login");
   var signupButton = document.querySelector(".signup");
   loginButton?.addEventListener("click", async (event) => {
@@ -704,7 +713,30 @@
     passwordInput.placeholder = "password";
     const loginButton2 = document.createElement("button");
     loginButton2.innerText = "login";
-    openPanel([usernameInput, passwordInput, loginButton2]);
+    const status = document.createElement("div");
+    status.style.color = "red";
+    function setStatus(color = "transparent", text = "") {
+      status.innerText = text;
+      status.style.color = color;
+    }
+    async function loginACC() {
+      const response = await login(usernameInput.value, passwordInput.value);
+      if (response.type == 0 /* SUCCESS */) {
+        setStatus("green", "Account Login Successful!");
+        setTimeout(() => location.reload(), 500);
+      } else if (response.type == 1 /* FAIL */) {
+        if (response.data == 3 /* ACCOUNT_DOESNT_EXIST */ || response.data == 4 /* ACCOUNT_PASSWORD_INVALID */) {
+          setStatus("red", "Username or Password Incorrect");
+        }
+      }
+    }
+    loginButton2.addEventListener("click", loginACC);
+    const panel2 = openPanel([usernameInput, passwordInput, loginButton2, status]);
+    panel2.addEventListener("keydown", (ev) => {
+      if (ev.key == "Enter") {
+        loginACC();
+      }
+    });
   });
   signupButton?.addEventListener("click", async (event) => {
     const usernameInput = document.createElement("input");
@@ -716,7 +748,6 @@
     signupButton2.innerText = "signup";
     const status = document.createElement("div");
     status.style.color = "red";
-    status.style.textWrap = "break-word";
     function setStatus(color = "transparent", text = "") {
       status.innerText = text;
       status.style.color = color;

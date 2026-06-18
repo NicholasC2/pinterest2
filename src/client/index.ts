@@ -49,7 +49,7 @@ async function createAccount(username: string, password: string, profile: Profil
         iterations: 3,
         memorySize: 65536,
         hashLength: 32,
-        outputType: 'hex'
+        outputType: 'encoded'
     });
 
     return await sendAPIMessage({
@@ -71,6 +71,16 @@ async function checkUsername(username: string): Promise<Boolean> {
     })).data === true;
 }
 
+async function login(username: string, password: string) {
+    return await sendAPIMessage({
+        type: MessageToServerType.ACCOUNT_LOGIN,
+        data: {
+            username,
+            password
+        }
+    });
+}
+
 const loginButton = document.querySelector(".login")
 const signupButton = document.querySelector(".signup")
 
@@ -84,8 +94,37 @@ loginButton?.addEventListener("click", async(event)=>{
 
     const loginButton = document.createElement("button");
     loginButton.innerText = "login";
+    
+    const status = document.createElement("div");
+    status.style.color = "red";
 
-    openPanel([usernameInput, passwordInput, loginButton]);
+    function setStatus(color: string = "transparent", text: string = "") {
+        status.innerText = text;
+        status.style.color = color;
+    }
+    
+    async function loginACC() {
+        const response = await login(usernameInput.value, passwordInput.value);
+
+        if(response.type == MessageToClientType.SUCCESS) {
+            setStatus("green", "Account Login Successful!");
+            setTimeout(() => location.reload(), 500)
+        } else if(response.type == MessageToClientType.FAIL) {
+            if(response.data == ErrorToClientType.ACCOUNT_DOESNT_EXIST || response.data == ErrorToClientType.ACCOUNT_PASSWORD_INVALID) {
+                setStatus("red", "Username or Password Incorrect");
+            }
+        }
+    }
+
+    loginButton.addEventListener("click", loginACC)
+
+    const panel = openPanel([usernameInput, passwordInput, loginButton, status]);
+
+    panel.addEventListener("keydown", (ev)=>{
+        if(ev.key == "Enter") {
+            loginACC()
+        }
+    })
 })
 
 signupButton?.addEventListener("click", async(event)=>{
@@ -101,7 +140,6 @@ signupButton?.addEventListener("click", async(event)=>{
 
     const status = document.createElement("div");
     status.style.color = "red";
-    status.style.textWrap = "break-word"
 
     function setStatus(color: string = "transparent", text: string = "") {
         status.innerText = text;
