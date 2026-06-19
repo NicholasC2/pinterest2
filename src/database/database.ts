@@ -21,7 +21,11 @@ export class Account {
 }
 
 export class Profile {
+    profileImageURL?: string;
 
+    constructor(profileImageURL: string) {
+        this.profileImageURL = profileImageURL;
+    }
 }
 
 export class Session {
@@ -61,9 +65,14 @@ type StoreData = {
     sessions: Session[];
 
     images: ImageStore[];
+    tags: string[];
 }
 
 const adapter = new JSONFileSync<StoreData>('./db.json')
-const db = new LowSync(adapter, {accounts: [], sessions: [], images: []});
+const db = new LowSync(adapter, {accounts: [], sessions: [], images: [], tags: []});
+
+db.read()
+db.data.tags = ["test", "test2", "test3"]
+db.write()
 
 export default db;

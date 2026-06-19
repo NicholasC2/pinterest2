@@ -1,10 +1,10 @@
 let panel = document.createElement("div");
 
-export function openPanel(elements: HTMLElement[]) {
-    panel.remove();
+const panelBackground = document.createElement("div");
+panelBackground.className = "panel-background";
 
-    const panelBackground = document.createElement("div");
-    panelBackground.className = "panel-background";
+export function openPanel(elements: HTMLElement[], willClose: boolean = true) {
+    panel.remove();
 
     document.body.appendChild(panelBackground);
 
@@ -18,20 +18,13 @@ export function openPanel(elements: HTMLElement[]) {
         panelBackground.remove();
     }
 
-    const closeButton = document.createElement("button");
-    closeButton.onclick = closePanel
-
     panel.tabIndex = -1;
     panel.focus();
 
-    panelBackground.addEventListener("click", (e) => {
+    panelBackground.onclick = (e) => {
+        if(!willClose) return;
         closePanel();
-    });
+    };
 
-    closeButton.className = "close"
-    closeButton.innerHTML = "x"
-
-    panel.appendChild(closeButton)
-
-    return panel;
+    return {panel, closePanel};
 }

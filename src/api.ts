@@ -139,6 +139,15 @@ async function handleServerMessage(message: MessageToServer, session: Session | 
             }
         }
 
+        case MessageToServerType.GET_TAGS: {
+            return {
+                response: {
+                    type: MessageToClientType.SUCCESS,
+                    data: db.data.tags
+                }
+            }
+        }
+
         default: {
             return {
                 response: {

@@ -127,7 +127,7 @@ loginButton?.addEventListener("click", async(event)=>{
 
     const panel = openPanel([usernameInput, passwordInput, loginButton, status]);
 
-    panel.addEventListener("keydown", (ev)=>{
+    panel.panel.addEventListener("keydown", (ev)=>{
         if(ev.key == "Enter") {
             loginACC()
         }
@@ -207,7 +207,7 @@ signupButton?.addEventListener("click", async(event)=>{
 
     const panel = openPanel([usernameInput, passwordInput, signupButton, status]);
 
-    panel.addEventListener("keydown", (ev)=>{
+    panel.panel.addEventListener("keydown", (ev)=>{
         if(ev.key == "Enter") {
             createACC()
         }
@@ -217,6 +217,8 @@ signupButton?.addEventListener("click", async(event)=>{
 ;(async ()=>{
     const response = await getAccount();
 
+    const data = response.data ?? {}
+
     if(response.type == MessageToClientType.SUCCESS && response.data) {
         const accountElem = document.querySelector(".navbar > .account")
 
@@ -225,8 +227,8 @@ signupButton?.addEventListener("click", async(event)=>{
             accountAvatar.className = "avatar"
 
             const accountAvatarIMG = document.createElement("img");
-            if(response.data["profile"].imageURL) {
-                accountAvatarIMG.src = response.data["profile"].imageURL;
+            if(data.profile.imageURL) {
+                accountAvatarIMG.src = data.profile.imageURL;
             } else {
                 accountAvatarIMG.src = "/assets/images/placeholder.png"
             }
@@ -245,7 +247,7 @@ signupButton?.addEventListener("click", async(event)=>{
                     accountMenu.className = "account-menu"
 
                     const usernameLabel = document.createElement("div");
-                    usernameLabel.innerText = response.data?.["username"];
+                    usernameLabel.innerText = data.username;
     
                     const logoutButton = document.createElement("button");
                     logoutButton.innerHTML = "logout";
@@ -261,16 +263,96 @@ signupButton?.addEventListener("click", async(event)=>{
     
                     accountMenu.replaceChildren(usernameLabel, logoutButton);
 
+                    document.body.appendChild(accountMenu);
+
                     accountMenu.tabIndex = -1;
                     accountMenu.focus();
                     
-                    accountMenu.addEventListener("blur", (ev)=>{
-                        if(ev.target == accountMenu) return;
-                        accountMenu.remove();
-                    })
-
-                    document.body.appendChild(accountMenu);
+                    accountMenu.addEventListener("blur", (ev) => {
+                        if (!accountMenu.contains(ev.relatedTarget)) {
+                            accountMenu.remove();
+                        }
+                    }, true);
                 }
+            })
+        }
+
+        const navLinks = document.querySelector(".nav-links");
+
+        if(navLinks) {
+            const uploadLink = document.createElement("a");
+            uploadLink.className = "button";
+            uploadLink.innerText = "Upload Image"
+            navLinks.appendChild(uploadLink);
+
+            uploadLink.addEventListener("click", ()=>{
+                const uploadFile = document.createElement("input");
+                uploadFile.type = "file";
+                uploadFile.accept = ".png,.jpg,.jpeg";
+                
+                const panel = openPanel([uploadFile])
+
+                uploadFile.addEventListener("input", async()=>{
+                    const file = uploadFile.files?.[0]
+
+                    if(file) {
+                        const nameInput = document.createElement("input");
+                        nameInput.placeholder = "Image Name";
+
+                        const tagsLabel = document.createElement("div");
+                        tagsLabel.innerText = "Tags:"
+
+                        const tags = document.createElement("select");
+                        tags.name = "tags";
+                        tags.multiple = true;
+                        tags.size = 1;
+                        
+                        function createOption(value: string): HTMLOptionElement {
+                            const elem = document.createElement("option");
+
+                            elem.value = value;
+                            elem.innerText = value;
+
+                            return elem;
+                        }
+
+                        const result = await sendAPIMessage({
+                            type: MessageToServerType.GET_TAGS
+                        })
+
+                        let tagOptions: HTMLOptionElement[] = [];
+
+                        if(result.data) {
+                            result.data.forEach(tag => {
+                                tagOptions.push(createOption(tag))
+                            });
+                        }
+
+                        tags.replaceChildren(...tagOptions);
+
+                        const submitButton = document.createElement("button");
+                        submitButton.innerText = "Upload"
+
+                        const statusText = document.createElement("div");
+
+                        submitButton.onclick = ()=>{
+                            if(nameInput.value.trim().length === 0) {
+                                statusText.innerHTML = "Name must not be empty"
+                                statusText.style.color = "red";
+                                return;
+                            }
+
+                            statusText.innerHTML = "";
+
+                            const uploadingText = document.createElement("div");
+                            uploadingText.innerText = "Uploading..."
+
+                            openPanel([uploadingText], false)
+                        }
+
+                        panel.panel.replaceChildren(nameInput, tagsLabel, tags, submitButton, statusText);
+                    }
+                })
             })
         }
     }
