@@ -1,0 +1,10 @@
+.navbar > * {
+    display: inline-flex;
+    flex-direction: row;
+}
+
+.navbar > * * {
+    height: 20px;
+
+    margin: 3px;
+}
