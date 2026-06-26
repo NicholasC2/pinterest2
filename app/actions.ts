@@ -2,31 +2,36 @@
 
 import client from "@/lib/mongodb";
 import { Account } from "@/src/Account";
+import { Collection, Document } from "mongodb";
 
-const db = client.db("pinterest2");
-
-export async function createImage(data: FormData) {
+async function getDB<T extends Document>(name: string): Promise<Collection<T>> {
   await client.connect();
 
-  await db.collection("images").insertOne({
-    title: data.get("title") as string,
-    createdAt: new Date(),
-  });
+  const db = client.db("pinterest2");
+
+  return db.collection<T>(name);
+}
+
+export async function accountExists(username: string): Promise<Boolean> {
+  const accounts = await getDB<Account>("accounts");
+
+  return !!await accounts.findOne({ name: username })
 }
 
 export async function addAccount(acc: Account) {
-  await client.connect();
+  const accounts = await getDB<Account>("accounts");
 
-  await db.collection("accounts").insertOne({
-    _id: acc.name,
-    createdAt: new Date(),
-  });
+  if(await accountExists(acc.name)) {
+    throw new Error("Account exists")
+  }
+
+  await accounts.insertOne(acc);
 }
 
 export async function removeAccount(username: string) {
-  await client.connect();
+  const accounts = await getDB<Account>("accounts");
   
-  await db.collection("accounts").deleteOne({
-    _id: username,
+  await accounts.deleteMany({
+    name: username,
   });
 }

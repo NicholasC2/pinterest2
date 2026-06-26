@@ -3,6 +3,8 @@
 import NextImage from "next/image";
 import Masonry from "react-masonry-css";
 
+import "../assets/css/gallery.css"
+
 interface GalleryImage {
   id: string;
   url: string;

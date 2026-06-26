@@ -1,5 +1,5 @@
-import { ChevronDown, Search } from "lucide-react";
-import "./assets/css/navbar.css"
+import { Search } from "lucide-react";
+import "../assets/css/navbar.css"
 import { TButton, TInput, TNavbar } from "@t-apps/ui";
 
 export default function Navbar() {
