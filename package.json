@@ -1,35 +1,30 @@
 {
   "name": "pinterest2",
-  "version": "1.0.0",
-  "description": "pinterest but 2",
-  "license": "ISC",
-  "author": "NicholasC2",
-  "type": "module",
-  "main": "dist/index.js",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "concurrently \"tsx watch src/index.ts\" \"esbuild src/client/index.ts --bundle --platform=browser --outfile=static/assets/js/client.js --watch --log-level=info\"",
-    "build:server": "tsc",
-    "build:client": "esbuild src/client/index.ts --bundle --minify --platform=browser --outfile=static/assets/js/client.js",
-    "build": "npm run build:server && npm run build:client",
-    "start": "node dist/index.js"
-  },
-  "devDependencies": {
-    "@types/argon2-browser": "^1.18.4",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/express": "^5.0.6",
-    "@types/masonry-layout": "^4.2.8",
-    "@types/node": "^24.13.2",
-    "concurrently": "^10.0.3",
-    "esbuild": "^0.28.1",
-    "tsx": "^4.22.4",
-    "typescript": "^5.9.3"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
   },
   "dependencies": {
-    "argon2": "^0.44.0",
-    "cookie-parser": "^1.4.7",
-    "express": "^5.2.1",
-    "hash-wasm": "^4.12.0",
-    "lowdb": "^7.0.1",
-    "masonry-layout": "^4.2.2"
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-icons": "^5.7.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true
   }
 }
