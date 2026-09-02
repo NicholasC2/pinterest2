@@ -23,24 +23,46 @@ export function Navbar() {
           </div>
         </nav>
 
-        {loginOpen && <div className="w-full h-full" style={{position: "absolute", top: 0, left: 0, backgroundColor: "#00000060"}}>
+        {loginOpen && 
           <div 
-            className="flex flex-col p-5" 
+            className="w-full h-full" 
             style={{
               position: "absolute", 
-              top: "50%", 
-              left: "50%", 
-              transform: "translate(-50%, -50%)", 
-              backgroundColor: "var(--bg-secondary)"
-            }} onBlur={()=>{setLoginOpen(false)}}>
+              top: 0, 
+              left: 0, 
+              backgroundColor: "#00000050"
+            }}
+            onClick={(ev) => {
+              if (ev.target === ev.currentTarget) {
+                setLoginOpen(false);
+              }
+            }}
+          >
+            <form
+              onSubmit={login}
+              className="flex flex-col p-5" 
+              style={{
+                position: "absolute", 
+                top: "50%", 
+                left: "50%", 
+                transform: "translate(-50%, -50%)", 
+                backgroundColor: "var(--bg-secondary)"
+              }}
+            >
               <FaX size={14} style={{cursor: "pointer", position: "absolute", right: "10px", top: "10px"}} onClick={()=>{setLoginOpen(false)}} />
               <label>Username:</label>
-              <input type="text" style={{outline: "none", backgroundColor: "var(--bg-tertiary)"}}></input>
+              <input type="text" name="username" style={{outline: "none", backgroundColor: "var(--bg-tertiary)"}}></input>
               <label>Password:</label>
-              <input type="password" style={{outline: "none", backgroundColor: "var(--bg-tertiary)"}}></input>
-              <button>Log in</button>
+              <input type="password" name="password" style={{outline: "none", backgroundColor: "var(--bg-tertiary)"}}></input>
+              <input type="submit" text="Login"></input>
+            </form>
           </div>
-        </div>}
+        }
       </>
     )
+}
+
+function login(ev: any) {
+  console.log(args)
+  ev.preventDefault()
 }
