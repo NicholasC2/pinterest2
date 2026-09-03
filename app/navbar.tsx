@@ -1,14 +1,23 @@
 "use client";
-import { SyntheticEvent, useEffect, useState } from "react";
-import { FaBars, FaLayerGroup, FaSearch } from "react-icons/fa";
-import { FaBurger, FaX } from "react-icons/fa6";
+import { SyntheticEvent, useState } from "react";
+import { FaSearch } from "react-icons/fa";
+import { FaX } from "react-icons/fa6";
 
 export function Navbar() {
   const [openForm, setOpenForm] = useState(0);
 
   return (
     <>
-      <nav className="flex flex-row w-full gap-2 h-10 p-2" style={{backgroundColor: "var(--bg-secondary)", alignItems: "center"}}>
+      <nav 
+        className="flex flex-row w-full gap-2 h-10 p-2" 
+        style={{
+          backgroundColor: "var(--bg-secondary)", 
+          alignItems: "center",
+          position: "sticky",
+          top: 0,
+          left: 0
+        }}
+      >
         <div>
           <a href="/">Home</a>
         </div>
